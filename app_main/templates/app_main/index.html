@@ -1,0 +1,87 @@
+{% extends 'auth/base.html' %}
+{% load static %}
+{% block content %}
+<main class="vh-100 bg-body-tertiary">
+    <div class="container m-auto mt-5 row gap-2 justify-content-center">
+        <h1 class="d-flex justify-content-center mb-2">{{ product.category.title }}</h1>
+        {% for product in products %}
+        <div class="card col-3 p-0">
+            {% if product.old_price %}
+            <div class="badge bg-dark text-white position-absolute"
+                 style="top: 0.5rem; right: 0.5rem">
+                Sale
+            </div>
+            {% endif %}
+            <img class="card-img-top" src="{{ product.image.url }}" alt="Card image cap"/>
+            <div class="card-body">
+                <h3>
+                    <a class="text-decoration-none" href="">{{ product.title }}</a>
+                </h3>
+                <p class="card-text">
+                    {{ product.description |truncatechars:50 }}
+                </p>
+                <div class="d-flex flex-column gap-2">
+                    {% if product.old_price %}
+                    <div class="d-flex align-items-center gap-2">
+                        <b>
+                            <small> Old price: </small>
+                        </b>
+                        <small class="text-decoration-line-through">
+                            <b class="text-danger">${{product.old_price}}</b>
+                        </small>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex align-items-center gap-2">
+                        <b>
+                            <small>Current price: </small>
+                        </b>
+                        <small class="">
+                            <b class="text-success">${{product.price}}</b>
+                        </small>
+                    </div>
+                </div>
+                {% if not request.user.is_authenticated %}
+                <b>
+                    Please, <a href="{% url 'login' %}">log in</a> to add product to your
+                    cart
+                </b>
+                {% else %}
+                <a href="{% url 'add_to_cart' product.id %}"
+                   class="mt-2 w-100 d-flex align-items-center justify-content-center font-bold btn btn-warning">
+                    <i class="bi bi-cart-plus"></i>
+                    Add Card
+                </a>
+                <a href="{% url 'product_detail' product.id %}"
+                   class="mt-2 w-100 d-flex align-items-center justify-content-center font-bold btn btn-warning">
+                    <i class="bi bi-cart-plus"></i>
+                    Detail
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="d-flex justify-content-center mt-5">
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li>
+                    <a href="{% if not page_obj.has_previous %} #! {% else %} ?page={{ page_obj.previous_page_number }}{% endif %}"
+                       class="btn  {% if not page_obj.has_previous %} btn--disabled{%endif%}" tabindex="-1">&laquo;</a>
+                </li>
+                {% for page in page_obj.paginator.page_range %}
+                <li>
+                    <a class="btn {% if page == page_obj.number %} btn--sub {% endif %}"
+                       href=" {% if page == page_obj.number %}#!{% else %}?page={{page}}{% endif %}">
+                        {{ page }}</a>
+                </li>
+
+                {% endfor %}
+                <li>
+                    <a href="{% if not page_obj.has_next %} #! {% else %} ?page={{ page_obj.next_page_number }}{% endif %}"
+                       class="btn  {% if not page_obj.has_next %} btn--disabled{%endif%}" tabindex="-1">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</main>
+{% endblock %}
